@@ -2,23 +2,24 @@ import sys
 
 from lf_toolkit.shared.params import Params
 
-from .evaluation import evaluation_function
+from evaluation_function.evaluation import evaluation_function
+from evaluation_function.preview import preview_function
+
 
 def dev():
     """Run the evaluation function from the command line for development purposes.
 
     Usage: python -m evaluation_function.dev <answer> <response>
     """
-    if len(sys.argv) < 3:
-        print("Usage: python -m evaluation_function.dev <answer> <response>")
-        return
     
-    answer = sys.argv[1]
-    response = sys.argv[2]
+    answer = "x+y"
+    response = "x+y"
+    params = {"type": "structure"}
 
-    result = evaluation_function(answer, response, Params())
+    # result = evaluation_function(answer, response, params)
+    result = preview_function(response, {})
 
-    print(result.to_dict())
+    print(result)
 
 if __name__ == "__main__":
     dev()

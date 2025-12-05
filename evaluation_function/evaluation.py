@@ -1,5 +1,8 @@
+import json
 from typing import Any
 from lf_toolkit.evaluation import Result, Params
+import os
+import requests
 
 def evaluation_function(
     response: Any,
@@ -29,6 +32,33 @@ def evaluation_function(
     to output the evaluation response.
     """
 
-    return Result(
-        is_correct=response == answer
-    )
+    url = os.getenv("EVALUATE_API")
+
+    eval_type = params["type"]
+    data_payload = {
+        "type": eval_type,
+        "response": response,
+        "answer": answer,
+        "params": json.dumps(params)
+    }
+
+    response = requests.post(url, data=data_payload)
+    response_json = response.json()
+
+    if "Success" in response_json:
+        if not response_json["Success"]:
+            result = Result(is_correct=False)
+            result.add_feedback(tag="error", feedback="Wolfram Error")
+            return result
+
+    if "error" in response_json:
+        if response_json["error"] is not None:
+            result = Result(is_correct=False)
+            result.add_feedback(tag="error", feedback=response_json["error"])
+            return result
+
+
+    result = Result(is_correct=response_json["is_correct"])
+    result.add_feedback(tag="feedback", feedback=response_json["feedback"])
+
+    return result

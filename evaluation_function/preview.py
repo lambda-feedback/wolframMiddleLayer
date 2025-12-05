@@ -1,4 +1,7 @@
+import os
 from typing import Any
+
+import requests
 from lf_toolkit.preview import Result, Params, Preview
 
 def preview_function(response: Any, params: Params) -> Result:
@@ -21,10 +24,31 @@ def preview_function(response: Any, params: Params) -> Result:
     The way you wish to structure you code (all in this function, or
     split into many) is entirely up to you.
     """
-
     try:
-        return Result(preview=Preview(sympy=response))
-    except FeedbackException as e:
-        return Result(preview=Preview(feedback=str(e)))
+        url = os.getenv("PREVIEW_API")
+
+        data_payload = {
+            "response": response
+        }
+
+        wolfram_response = requests.post(url, data=data_payload)
+        response_json = wolfram_response.json()
+
+        print(response_json)
+
+        if "Success" in response_json:
+            if not response_json["Success"]:
+                result = Result(preview=Preview(feedback=response_json["error"]))
+                return result
+
+        if "error" in response_json:
+            if response_json["error"] is not None:
+                result = Result(preview=Preview(feedback=response_json["error"]))
+                return result
+
+
+        result = Result(preview=Preview(latex=response_json["latexString"],sympy=response_json["sympyString"]))
+
+        return result
     except Exception as e:
         return Result(preview=Preview(feedback=str(e)))
