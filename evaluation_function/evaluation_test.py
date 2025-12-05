@@ -1,4 +1,5 @@
 import unittest
+from unittest.mock import Mock, patch
 
 from .evaluation import Params, evaluation_function
 
@@ -21,10 +22,27 @@ class TestEvaluationFunction(unittest.TestCase):
     as it should.
     """
 
-    def test_evaluation(self):
-        response, answer, params = "Hello, World", "Hello, World", Params()
+    @patch('requests.post')
+    def test_evaluation(self, mock_post):
+        mock_api_response = {
+            "is_correct": True,
+            "feedback": "",
+            "error": None
+        }
 
-        result = evaluation_function(response, answer, params).to_dict()
+        mock_response_obj = Mock()
+        mock_response_obj.status_code = 200
+        mock_response_obj.json.return_value = mock_api_response
 
+        mock_post.return_value = mock_response_obj
+
+        # 4. Run your actual test logic
+        response_input, answer, params = "x+y", "x+y", {"type": "structure"}
+
+        result = evaluation_function(response_input, answer, params).to_dict()
+
+        # 5. Assertions
         self.assertEqual(result.get("is_correct"), True)
         self.assertFalse(result.get("feedback", False))
+
+        mock_post.assert_called_once()

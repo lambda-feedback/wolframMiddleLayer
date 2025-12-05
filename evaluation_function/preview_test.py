@@ -1,4 +1,5 @@
 import unittest
+from unittest.mock import patch, Mock
 
 from .preview import Params, preview_function
 
@@ -21,7 +22,19 @@ class TestPreviewFunction(unittest.TestCase):
     as it should.
     """
 
-    def test_preview(self):
+    @patch('requests.post')
+    def test_preview(self, mock_post):
+        mock_api_response = {
+            "latex_string": "A",
+            "sympy_string": "A"
+        }
+
+        mock_response_obj = Mock()
+        mock_response_obj.status_code = 200
+        mock_response_obj.json.return_value = mock_api_response
+
+        mock_post.return_value = mock_response_obj
+
         response, params = "A", Params()
         result = preview_function(response, params)
 
