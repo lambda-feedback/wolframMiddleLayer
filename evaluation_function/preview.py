@@ -47,7 +47,7 @@ def preview_function(response: Any, params: Params) -> Result:
                 return result
 
 
-        result = Result(preview=Preview(latex=response_json["latexString"],sympy=response_json["sympyString"]))
+        result = Result(preview=Preview(latex=response_json["latex"],sympy=response_json["sympy"]))
 
         return result
     except Exception as e:
