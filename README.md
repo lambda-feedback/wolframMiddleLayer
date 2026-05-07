@@ -2,6 +2,9 @@
 
 This repository forwards requests to the Wolfram Cloud API.
 
+## Deployment
+[![Create Release Request](https://img.shields.io/badge/Create%20Release%20Request-blue?style=for-the-badge)](https://github.com/lambda-feedback/wolframMiddleLayer/issues/new?template=release-request.yml)
+
 ## Usage
 
 You can run the evaluation function either using [the pre-built Docker image](#run-the-docker-image) or build and run [the binary executable](#build-and-run-the-binary).
